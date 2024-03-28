@@ -1,10 +1,10 @@
-import { EMAIL_USER } from "../../config/config"
+import { NODEMAILER_USER } from "../../config/config.js"
 
 class FakeEmailService {
 
   async send(destinatario, asunto, mensaje, adjuntos = []) {
     const emailOptions = {
-      from: EMAIL_USER,
+      from: NODEMAILER_USER,
       to: destinatario,
       subject: asunto,
       text: mensaje

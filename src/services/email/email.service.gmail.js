@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-import { EMAIL_PASS, EMAIL_USER } from '../../config/config'
+import { NODEMAILER_PASSWORD, NODEMAILER_USER } from '../../config/config.js'
 
 class GmailEmailService {
 
@@ -8,15 +8,15 @@ class GmailEmailService {
       service: 'gmail',
       port: 587,
       auth: {
-        user: EMAIL_USER,
-        pass: EMAIL_PASS
+        user: NODEMAILER_USER,
+        pass: NODEMAILER_PASSWORD
       }
     })
   }
 
   async send(destinatario, asunto, mensaje, adjuntos = []) {
     const emailOptions = {
-      from: EMAIL_USER,
+      from: NODEMAILER_USER,
       to: destinatario,
       subject: asunto,
       text: mensaje

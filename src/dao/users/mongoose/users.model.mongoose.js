@@ -120,6 +120,21 @@ const userSchema = new mongoose.Schema(
           throw error;
         }
       },
+      updatePassword: async function (email, newPassword) {
+        try {
+          const user = await this.findOne({ email });
+          if (!user) {
+            const error = new Error("User not found");
+            error.code = errorStatusMap.NOT_FOUND;
+            throw error;
+          }
+          const hashedPassword = await hashPassword(newPassword);
+          await this.findOneAndUpdate({ email }, { password: hashedPassword });
+          return { message: "Password updated" };
+        } catch (error) {
+          throw error;
+        }
+      },
     },
   }
   // statics: {

@@ -28,8 +28,8 @@ export const PRODUCTS_PATH_JSON = process.env.PRODUCTS_PATH_JSON;
 export const ORDERS_PATH_JSON = process.env.ORDERS_PATH_JSON;
 export const PORT = process.env.PORT;
 
-export const EMAIL_USER = process.env.EMAIL_USER;
-export const EMAIL_PASS = process.env.EMAIL_PASS;
+export const NODEMAILER_USER = process.env.NODEMAILER_USER;
+export const NODEMAILER_PASSWORD = process.env.NODEMAILER_PASSWORD;
 
 export const TESTING_EMAIL = process.env.TESTING_EMAIL;
 export const TESTING_PASSWORD = process.env.TESTING_PASSWORD;

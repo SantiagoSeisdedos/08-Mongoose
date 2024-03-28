@@ -6,6 +6,8 @@ import { isAuthorized } from "../../middlewares/authorization.js";
 export const usersRouter = Router();
 
 usersRouter.post("/", UserController.register);
+usersRouter.post("/reset", UserController.resetPassword);
+usersRouter.post("/recoverAccount", UserController.recoverAccount);
 
 usersRouter.get(
   "/current",
@@ -21,14 +23,13 @@ usersRouter.get(
   UserController.getUsers
 );
 
+usersRouter.get(
+  "/:email",
+  UserController.getUser
+);
+
 usersRouter.put(
   "/",
   passport.authenticate("jwt", { failWithError: true, session: false }),
   UserController.updateUser
-);
-
-usersRouter.post(
-  "/premium/:uid",
-  passport.authenticate("local", { failWithError: true, session: false }),
-  UserController.login
 );

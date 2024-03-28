@@ -44,3 +44,14 @@ usersRouter.get("/profile", (req, res) => {
     return res.status(500).json({ message: "Error loading /profile" });
   }
 });
+
+usersRouter.get("/recoverAccount", (req, res) => {
+  try {
+    return res.render("recoverAccount.handlebars", {
+      pageTitle: "Recover Account",
+    });
+  } catch (error) {
+    logger.info(error);
+    return res.status(500).json({ message: "Error loading /recoverAccount" });
+  }
+});
