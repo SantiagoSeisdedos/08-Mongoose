@@ -12,26 +12,22 @@ import {
 } from "../config/config.js";
 
 // Passport local strategy
-passport.use(
-  "localLogin",
-  new LocalStrategy(
-    {
-      usernameField: "email",
-    },
-    async function verificationCallback(username, password, done) {
-      try {
-        console.log("01 verificationCallback");
-        console.log("username", username, "password", password);
-        const userData = await userModel.login(username, password);
-        console.log("02 userData", userData);
-        done(null, userData);
-      } catch (error) {
-        console.log("03 error", error);
-        done(error);
-      }
-    }
-  )
-);
+// passport.use(
+//   "localLogin",
+//   new LocalStrategy(
+//     {
+//       usernameField: "email",
+//     },
+//     async function verificationCallback(username, password, done) {
+//       try {
+//         const userData = await userModel.login(username, password);
+//         done(null, userData);
+//       } catch (error) {
+//         done(error);
+//       }
+//     }
+//   )
+// );
 
 // Passport Github strategy
 passport.use(
@@ -62,6 +58,11 @@ passport.use(
     {
       jwtFromRequest: function (req) {
         var token = null;
+        console.log("00a jwtFromRequest Before if", req["signedCookies"]);
+        console.log(
+          "00b jwtFromRequest Before if",
+          req["signedCookies"]["authorization"]
+        );
         if (
           req &&
           req["signedCookies"] &&
@@ -69,8 +70,9 @@ passport.use(
         ) {
           token = req["signedCookies"]["authorization"];
         }
+
         console.log("01 jwtFromRequest After if", token);
-        console.log("02 jwtFromRequest After secretOrKey", JWT_SECRET)
+        console.log("02 jwtFromRequest After secretOrKey", JWT_SECRET);
         return token;
       },
       secretOrKey: JWT_SECRET,

@@ -23,9 +23,8 @@ productsRouter.get("/:id", validateId, getProductController);
 // POST
 productsRouter.post(
   "/",
-  // TODO: Add login verification on test
-  // passport.authenticate("jwt", { failWithError: true, session: false }),
-  // isAuthorized(["admin"]),
+  passport.authenticate("jwt", { failWithError: true, session: false }),
+  isAuthorized(["admin", "premium"]),
   validateProductData,
   postProductController
 );
@@ -34,7 +33,7 @@ productsRouter.post(
 productsRouter.put(
   "/:id",
   passport.authenticate("jwt", { failWithError: true, session: false }),
-  isAuthorized(["admin"]),
+  isAuthorized(["admin", "premium"]),
   validateUpdates,
   putProductController
 );
@@ -43,7 +42,7 @@ productsRouter.put(
 productsRouter.delete(
   "/:id",
   passport.authenticate("jwt", { failWithError: true, session: false }),
-  isAuthorized(["admin"]),
+  isAuthorized(["admin", "premium"]),
   validateId,
   deleteProductController
 );

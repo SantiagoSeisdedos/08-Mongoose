@@ -5,20 +5,20 @@ export async function getProductsController(req, res, next) {
   try {
     const { limit, page, sort, query } = req.query;
 
-    const products = await productsService.readMany({
+    const productsWithPagination = await productsService.readMany({
       limit,
       page,
       sort,
       query,
     });
 
-    if (!products.length) {
+    if (!productsWithPagination.products.length) {
       const error = new Error("No se encontraron productos.");
       error.code = errorStatusMap.NOT_FOUND;
       throw error;
     }
 
-    res.json(products);
+    res.json(productsWithPagination);
   } catch (error) {
     next(error);
   }
@@ -41,7 +41,10 @@ export async function getProductController(req, res, next) {
 
 export async function postProductController(req, res, next) {
   try {
-    const product = await productsService.createOne(req.body);
+    const product = await productsService.createOne({
+      ...req.body,
+      owner: req.user.email,
+    });
 
     if (!product) {
       const error = new Error("No se pudo crear el producto");
@@ -50,6 +53,7 @@ export async function postProductController(req, res, next) {
     }
 
     res.status(201).json(product);
+    next();
   } catch (error) {
     next(error);
   }
@@ -58,13 +62,11 @@ export async function postProductController(req, res, next) {
 export async function putProductController(req, res, next) {
   try {
     const { id } = req.params;
-    const product = await productsService.updateOne(id, req.body);
+    const product = await productsService.updateOne(id, req.body, {
+      email: req.user.email,
+      rol: req.user.rol,
+    });
 
-    if (!product) {
-      const error = new Error(`No se encontró ningún producto con el ID ${id}`);
-      error.code = errorStatusMap.NOT_FOUND;
-      throw error;
-    }
     res.json({
       status: 201,
       message: "Producto actualizado correctamente.",
@@ -78,13 +80,10 @@ export async function putProductController(req, res, next) {
 export async function deleteProductController(req, res, next) {
   try {
     const { id } = req.params;
-    const products = await productsService.deleteOne(id);
-
-    if (!products) {
-      const error = new Error(`No se encontró ningún producto con el ID ${id}`);
-      error.code = errorStatusMap.NOT_FOUND;
-      throw error;
-    }
+    const products = await productsService.deleteOne(id, {
+      email: req.user.email,
+      rol: req.user.rol,
+    });
 
     res.json({
       status: 204,

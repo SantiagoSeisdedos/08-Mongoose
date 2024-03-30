@@ -16,7 +16,7 @@
 }
 
 .product-item img {
-  cursor: pointer; /* Cambiar el cursor a pointer */
+  cursor: pointer; 
 }
 
 body {
@@ -27,22 +27,15 @@ body {
 /* Products List (index) */
 /* Estilos para los enlaces de productos */
 .product-list a {
-  display: block;
-  margin-bottom: 10px; /* Espacio entre enlaces */
-  color: #007bff; /* Color del texto */
-  text-decoration: none; /* Elimina la decoración de subrayado */
-  font-size: 16px; /* Tamaño de la fuente */
-}
-
-.product-list a:hover {
-  color: purple; /* Cambia el color al pasar el cursor sobre los enlaces */
+  margin-bottom: 8px;
+  font-size: 16px; 
 }
 
 /* Estilos para los botones de paginación */
 .pagination a {
   display: inline-block;
   padding: 10px 20px;
-  margin-right: 5px; /* Espacio entre botones de paginación */
+  margin-right: 5px;
   background-color: #007bff;
   color: #ffffff;
   text-decoration: none;
@@ -61,4 +54,42 @@ body {
   padding: 8px;
   border-radius: 8px;
   justify-content: center;
+}
+
+.product-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #707070;
+}
+
+.product-item img {
+  width: 200px; /* Tamaño fijo para las imágenes */
+  height: 200px;
+  object-fit: cover; /* Para mantener la proporción de la imagen */
+  margin-bottom: 10px;
+  padding: 6px;
+  border-radius: 16px;
+}
+
+.product-item p {
+  margin-bottom: 5px;
+}
+
+.product-item button {
+  padding: 5px 10px;
+  background-color: #428bca;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.product-item button:hover {
+  background-color: aquamarine;
+  color: black;
 }

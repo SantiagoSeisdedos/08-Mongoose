@@ -2,7 +2,7 @@ import { daoProducts } from "../dao/daoInstance.js";
 import { errorStatusMap } from "../utils/errorCodes.js";
 
 class ProductsService {
-  async readMany({ limit = 10, page = 1, sort, query }) {
+  async readMany({ limit = 100, page = 1, sort, query }) {
     try {
       const parsedLimit = parseInt(limit);
       const parsedPage = parseInt(page);
@@ -34,7 +34,21 @@ class ProductsService {
 
       const filter = query ? { category: query } : {};
 
-      return await daoProducts.readMany(filter, options);
+      const result = await daoProducts.readMany(filter, options);
+
+      const totalProducts = await daoProducts.count(filter);
+      const totalPages = Math.ceil(totalProducts / limit);
+      // const nextPage = page < totalPages ? page + 1 : null;
+      const nextPage = parseInt(page) < totalPages ? parseInt(page) + 1 : null;
+      const prevPage = page > 1 ? page - 1 : null;
+
+      return {
+        products: result,
+        currentPage: page,
+        totalPages,
+        nextPage,
+        prevPage,
+      };
     } catch (error) {
       throw new Error(`Error en ProductsService.readMany: ${error}`);
     }
@@ -84,7 +98,7 @@ class ProductsService {
     }
   }
 
-  async updateOne(id, updates) {
+  async updateOne(id, updates, owner) {
     try {
       if (!id) {
         const error = new Error("El ID es requerido");
@@ -96,6 +110,29 @@ class ProductsService {
         error.code = errorStatusMap.INCORRECT_DATA;
         throw error;
       }
+
+      const product = await daoProducts.readOne(id);
+      if (!product) {
+        const error = new Error(
+          `No se encontró ningún producto con el ID ${id}`
+        );
+        error.code = errorStatusMap.NOT_FOUND;
+        throw error;
+      }
+
+      if (owner.rol === "admin") {
+        const updatedProduct = await daoProducts.updateOne(id, updates);
+        return updatedProduct;
+      }
+
+      if (owner && owner.email && owner.email !== product.owner) {
+        const error = new Error(
+          "No tienes permisos para actualizar este producto"
+        );
+        error.code = errorStatusMap.FORBIDDEN;
+        throw error;
+      }
+
       const updatedProduct = await daoProducts.updateOne(id, updates);
       return updatedProduct;
     } catch (error) {
@@ -103,13 +140,35 @@ class ProductsService {
     }
   }
 
-  async deleteOne(id) {
+  async deleteOne(id, owner) {
     try {
       if (!id) {
         const error = new Error("El ID es requerido");
         error.code = errorStatusMap.INCORRECT_DATA;
         throw error;
       }
+      const product = await daoProducts.readOne(id);
+      if (!product) {
+        const error = new Error(
+          `No se encontró ningún producto con el ID ${id}`
+        );
+        error.code = errorStatusMap.NOT_FOUND;
+        throw error;
+      }
+
+      if (owner.rol === "admin") {
+        const deletedProduct = await daoProducts.deleteOne(id);
+        return deletedProduct;
+      }
+
+      if (owner && owner.email && owner.email !== product.owner) {
+        const error = new Error(
+          "No tienes permisos para eliminar este producto"
+        );
+        error.code = errorStatusMap.FORBIDDEN;
+        throw error;
+      }
+
       const deletedProduct = await daoProducts.deleteOne(id);
       return deletedProduct;
     } catch (error) {

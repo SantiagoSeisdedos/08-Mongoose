@@ -12,8 +12,13 @@ formLogin?.addEventListener("submit", async (event) => {
 
     if (response.status === 201) {
       const sesion = await response.json();
-      alert(JSON.stringify(sesion));
-      window.location.href = "/profile";
+      Swal.fire({
+        title: "Bienvenido " + sesion.name + "!",
+        icon: "success",
+        confirmButtonText: "Ingresar",
+      }).then((result) => {
+        window.location.href = "/profile";
+      });
     } else {
       const error = await response.json();
       throw new Error(error.message || error);

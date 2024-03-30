@@ -1,5 +1,3 @@
-import { logger } from "../../src/utils/logger.js";
-
 const form = document.querySelector("form");
 const messageList = document.querySelector("ul");
 const messageInput = document.querySelector("#messageInput");

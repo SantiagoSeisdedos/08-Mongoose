@@ -44,7 +44,7 @@ webRouter.get("/products/:id", async (req, res) => {
       // O podrías renderizar una vista de "producto no encontrado"
     }
     return res.render("productDetails.handlebars", {
-      product,
+      product: product.data,
       baseUrl: BASE_URL + "/",
       pageTitle: `Producto ${product.title}`,
     });
