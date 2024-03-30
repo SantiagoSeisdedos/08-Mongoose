@@ -14,6 +14,10 @@ const productSchema = new Schema(
     stock: { type: Number, required: true },
     category: { type: String, required: true, max: 100 },
     timestamp: { type: Date, default: Date.now },
+    owner: {
+      type: String,
+      default: "admin",
+    },
   },
   {
     strict: "throw",

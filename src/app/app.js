@@ -26,6 +26,7 @@ import { BASE_URL, PORT } from "../config/config.js";
 
 export class ServerAPI {
   #server;
+  #webSocketServer;
 
   constructor() {
     this.app = express();
@@ -36,13 +37,6 @@ export class ServerAPI {
     this.app.engine("handlebars", handlebars.engine());
     this.app.use(sessions);
     this.app.use(authentication, passportSession);
-
-    // Socket.io
-    this.webSocketServer = new SocketIOServer(this.#server);
-
-    // Websocket server
-    this.webSocketServer.on("connection", onConnection(this.webSocketServer));
-    this.app.use(injectSocketServer(this.webSocketServer));
 
     // Public files
     this.app.use(express.static("public"));
@@ -58,6 +52,17 @@ export class ServerAPI {
     return new Promise((resolve, reject) => {
       this.#server = this.app.listen(port, () => {
         logger.info(`Server on port ${port}: ${baseUrl}`);
+
+        // Socket.io
+        this.#webSocketServer = new SocketIOServer(this.#server);
+
+        // Websocket server
+        this.#webSocketServer.on(
+          "connection",
+          onConnection(this.#webSocketServer)
+        );
+        this.app.use(injectSocketServer(this.#webSocketServer));
+
         resolve(this.#server);
       });
     });

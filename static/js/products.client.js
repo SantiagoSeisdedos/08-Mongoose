@@ -1,12 +1,6 @@
 const productList = document.getElementById("productList");
 const validMemberMessage = document.getElementById("validMemberMessage");
 const initialize = async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const lastAttemptedUsername = urlParams.get("lastAttemptedUsername");
-  if (lastAttemptedUsername) {
-    validMemberMessage.textContent = `Intentaste iniciar sesión como: ${lastAttemptedUsername}. Intenta con tu nombre, o uno de los siguientes: "admin", "santi", "jose", "tutor", "marian", "Jose Mariano"`;
-  }
-
   const fetchProducts = async (url) => {
     const response = await fetch(url);
 
@@ -18,19 +12,19 @@ const initialize = async () => {
     return products;
   };
 
-  const renderProducts = (products) => {
+  const renderProducts = (data) => {
     productList.innerHTML = "";
     productList.classList.add("product-list");
 
-    if (!products.hasDocuments) {
+    if (!data || data.length === 0) {
       const p = document.createElement("p");
-      p.innerHTML = products.error || "No se encontraron productos";
+      p.innerHTML = data.error || "No se encontraron productos";
       const productsTitle = document.querySelector("h1");
       productsTitle.insertAdjacentElement("afterend", p);
       return;
     }
 
-    for (const product of products.docs) {
+    for (const product of data.products) {
       const li = document.createElement("li");
       const productLink = document.createElement("a");
       productLink.textContent = `${product?.title} - $${product?.price}`;
@@ -46,7 +40,7 @@ const initialize = async () => {
     }
 
     const currentPage = document.createElement("p");
-    currentPage.textContent = `Page ${products.page} of ${products.totalPages}`;
+    currentPage.textContent = `Page ${data.currentPage} of ${data.totalPages}`;
     productList?.insertAdjacentElement("afterbegin", currentPage);
 
     const pagesButtonStyles = {
@@ -60,7 +54,7 @@ const initialize = async () => {
       marginLeft: "10px",
     };
 
-    if (products.prevPage) {
+    if (data.prevPage) {
       const prevPageLink = document.createElement("a");
       prevPageLink.classList.add("pagination");
       prevPageLink.href = "#"; // To prevent the default link behavior
@@ -73,7 +67,7 @@ const initialize = async () => {
       prevPageLink.addEventListener("click", async (event) => {
         event.preventDefault();
         const updatedProducts = await fetchProducts(
-          `/api/products?limit=${products.limit}&page=${products.prevPage}`
+          `/api/products?limit=${10}&page=${data.prevPage}`
         );
         renderProducts(updatedProducts);
       });
@@ -81,7 +75,7 @@ const initialize = async () => {
       productList?.insertAdjacentElement("afterbegin", prevPageLink);
     }
 
-    if (products.nextPage) {
+    if (data.nextPage) {
       const nextPageLink = document.createElement("a");
       nextPageLink.classList.add("pagination");
       nextPageLink.href = "#";
@@ -94,7 +88,7 @@ const initialize = async () => {
       nextPageLink.addEventListener("click", async (event) => {
         event.preventDefault();
         const updatedProducts = await fetchProducts(
-          `/api/products?limit=${products.limit}&page=${products.nextPage}`
+          `/api/products?limit=${10}&page=${data.nextPage}`
         );
         renderProducts(updatedProducts);
       });

@@ -1,7 +1,5 @@
-import { JWT_SECRET } from "../config/config.js";
 import { tokenizeUserInCookie } from "../middlewares/tokens.js";
 import { usersService } from "../services/users.service.js";
-import jwt from "jsonwebtoken";
 
 export const UserController = {
   async register(req, res, next) {
@@ -67,10 +65,9 @@ export const UserController = {
   async recoverAccount(req, res, next) {
     try {
       const { token, newPassword } = req.body;
-      const decoded = jwt.verify(token, JWT_SECRET);
 
       const updatedPassword = await usersService.updatePassword(
-        decoded.email,
+        token,
         newPassword
       );
 

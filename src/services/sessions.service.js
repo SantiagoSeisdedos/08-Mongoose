@@ -19,7 +19,7 @@ export async function authenticateUser(credentials) {
 }
 
 export function deleteAuthToken(req, res, next) {
-  return deleteTokenFromCookie(req, res, next).status(204).json({
+  return deleteTokenFromCookie(req, res, next).status(200).json({
     status: "success",
     message: "Token deleted successfully!",
   });

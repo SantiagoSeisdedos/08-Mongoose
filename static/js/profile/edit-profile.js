@@ -17,7 +17,6 @@ window.addEventListener("load", async (event) => {
     inputs[1].innerHTML = user.lastName;
     emailSpan.innerHTML = user.email;
   } catch (error) {
-    console.log(error);
     alert("Error loading /edit");
   }
 });
@@ -43,12 +42,10 @@ formEdit?.addEventListener("submit", async (event) => {
     },
     body,
   });
-  console.log("02 response", response);
   if (response.status === 200) {
     window.location.href = "/profile";
   } else {
     const error = await response.json();
-    console.log("03 edit profile error", error);
     alert(error.message);
   }
 });

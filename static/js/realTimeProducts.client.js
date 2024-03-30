@@ -1,14 +1,16 @@
 const form = document.querySelector("form");
 const productList = document.getElementById("productList");
 
-const validMembers = [
-  "admin",
-  "santi",
-  "jose",
-  "tutor",
-  "marian",
-  "Jose Mariano",
-];
+const getCurrentUser = async () => {
+  try {
+    const response = await fetch("/api/users/current");
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    alert("Ocurrió un error al obtener el usuario actual");
+    window.location.href = "/login";
+  }
+};
 
 const uploadImage = async (imageFile) => {
   try {
@@ -38,52 +40,13 @@ const updateHeader = (username) => {
   }
 };
 
-// Enter username
-Swal.fire({
-  title: "Bienvenido!",
-  input: "text",
-  confirmButtonText: "Entrar",
-  showLoaderOnConfirm: false,
-  allowOutsideClick: false,
-}).then((result) => {
-  if (!result.value) {
-    Swal.fire({
-      title: "Error!",
-      text: "Debes ingresar un nombre de usuario",
-      icon: "error",
-      confirmButtonText: "Ok",
-    }).then(() => {
-      window.location.href = "/products";
-    });
-  } else if (validMembers.includes(result.value.toLowerCase())) {
-    Swal.fire({
-      title: `Bienvenido ${result.value}`,
-      icon: "success",
-      timer: 1500,
-      timerProgressBar: true,
-      showConfirmButton: false,
-    });
-    updateHeader(result.value);
-    sendProductData(result.value);
-  } else {
-    Swal.fire({
-      title: "Error!",
-      text: "No estás autorizado para ingresar",
-      icon: "error",
-      confirmButtonText: "Ok",
-    }).then(() => {
-      window.location.href = `/products?lastAttemptedUsername=${result.value}`;
-      // window.location.href = "/";
-    });
-  }
-});
-
 const sendProductData = async (username) => {
   const socket = io({
     auth: {
-      username,
+      username: username || "admin",
     },
   });
+
   // send message/product
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -121,69 +84,85 @@ const sendProductData = async (username) => {
     const url = await uploadImage(imageFile);
     thumbnail.push(url);
 
-    socket.emit(
-      "addProduct",
-      title,
-      description,
-      price,
-      thumbnail,
-      code,
-      status,
-      stock,
-      category
-    );
+    const addProductOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        description,
+        price,
+        thumbnail,
+        code,
+        status,
+        stock,
+        category,
+      }),
+      credentials: "include",
+    };
+
+    await fetch(`http://localhost:8080/api/products`, addProductOptions)
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          throw new Error("No estas autorizado para agregar productos");
+        }
+        if (!res.ok) {
+          throw new Error("Error al agregar el producto: " + res.statusText);
+        }
+        return res.json();
+      })
+      .then((res) => {
+        Swal.fire({
+          title: "Producto agregado correctamente",
+          icon: "success",
+          confirmButtonText: "Ok",
+        });
+        return socket.emit("addProduct");
+      })
+      .catch((err) => {
+        Swal.fire({
+          title: "Ocurrió un error al agregar el producto!",
+          text: err.message,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+      });
+
     form.reset();
   });
 
-  // User Conected
-  socket.on("new-user", (username) => {
-    Swal.fire({
-      text: `Bienvenido ${username}`,
-      toast: true,
-      position: "top-right",
-      timer: 2500,
-      timerProgressBar: true,
-      showConfirmButton: false,
-    });
-  });
-
-  // User Disconected
-  socket.on("user-disconnected", (username) => {
-    Swal.fire({
-      text: `Te vamos a extrañar ${username}! Esperamos que vuelvas pronto`,
-      toast: true,
-      position: "top-right",
-      timer: 2500,
-      timerProgressBar: true,
-      showConfirmButton: false,
-    });
-  });
-
   // Get products
-  socket.on("getProducts", (products) => {
+  socket.on("getProducts", (data) => {
     productList.innerHTML = "";
-    for (const product of products.docs) {
+    for (const product of data.products) {
       const productItem = document.createElement("div");
       productItem.classList.add("product-item");
 
+      const imgContainer = document.createElement("div"); // Contenedor para la imagen
       const img = document.createElement("img");
       img.src = product.thumbnail;
       img.alt = product.title;
       img.width = 100;
       img.height = 100;
-      img.addEventListener("click", () => {
+      imgContainer.appendChild(img);
+
+      imgContainer.addEventListener("click", () => {
         window.open(`${product.thumbnail}`, "_blank");
       });
 
-      img.addEventListener("mouseover", () => {
-        img.style.cursor = "pointer";
+      imgContainer.addEventListener("mouseover", () => {
+        imgContainer.style.cursor = "pointer";
       });
 
       const title = document.createElement("p");
       title.textContent = product.title;
 
       const price = document.createElement("p");
-      price.textContent = `${product.price}`;
+      price.textContent = `$${product.price}`;
+
+      const owner = document.createElement("p");
+      owner.textContent = `${product.owner}`;
 
       // Delete Product
       const deleteButton = document.createElement("button");
@@ -198,16 +177,78 @@ const sendProductData = async (username) => {
           confirmButtonText: "Eliminar",
           cancelButtonText: "Cancelar",
         }).then((result) => {
-          if (result.isConfirmed) socket.emit("deleteProduct", product._id);
+          if (result.isConfirmed) {
+            fetch(`http://localhost:8080/api/products/${product._id}`, {
+              method: "DELETE",
+              credentials: "include",
+            })
+              .then((res) => {
+                if (res.status === 401 || res.status === 403) {
+                  throw new Error("No estas autorizado eliminar este producto");
+                }
+                if (!res.ok) {
+                  throw new Error(
+                    "Error al agregar el producto: " + res.statusText
+                  );
+                }
+                return res.json();
+              })
+              .then((res) => {
+                Swal.fire({
+                  title: "Producto eliminado correctamente",
+                  icon: "success",
+                  confirmButtonText: "Ok",
+                });
+                return socket.emit("deleteProduct");
+              })
+              .catch((err) => {
+                return Swal.fire({
+                  title: "Ocurrió un error al eliminar el producto!",
+                  text: err.message,
+                  icon: "error",
+                  confirmButtonText: "Ok",
+                });
+              });
+          }
         });
       });
 
-      productItem.appendChild(img);
+      productItem.appendChild(imgContainer);
       productItem.appendChild(title);
       productItem.appendChild(price);
+      productItem.appendChild(owner);
       productItem.appendChild(deleteButton);
 
       productList.appendChild(productItem);
     }
   });
 };
+
+// User Conected
+// socket.on("new-user", (username) => {
+//   Swal.fire({
+//     text: `Bienvenido ${username}`,
+//     toast: true,
+//     position: "top-right",
+//     timer: 2500,
+//     timerProgressBar: true,
+//     showConfirmButton: false,
+//   });
+// });
+
+// User Disconected
+// socket.on("user-disconnected", (username) => {
+//   Swal.fire({
+//     text: `Te vamos a extrañar ${username}! Esperamos que vuelvas pronto`,
+//     toast: true,
+//     position: "top-right",
+//     timer: 2500,
+//     timerProgressBar: true,
+//     showConfirmButton: false,
+//   });
+// });
+
+getCurrentUser().then((user) => {
+  updateHeader(`${user.email} (${user.rol})`);
+  sendProductData(user.email);
+});

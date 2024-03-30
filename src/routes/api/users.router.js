@@ -12,7 +12,7 @@ usersRouter.post("/recoverAccount", UserController.recoverAccount);
 usersRouter.get(
   "/current",
   passport.authenticate("jwt", { failWithError: true, session: false }),
-  isAuthorized(["admin", "user"]),
+  isAuthorized(["admin", "user", "premium"]),
   UserController.getCurrentUser
 );
 
@@ -23,10 +23,7 @@ usersRouter.get(
   UserController.getUsers
 );
 
-usersRouter.get(
-  "/:email",
-  UserController.getUser
-);
+usersRouter.get("/:email", UserController.getUser);
 
 usersRouter.put(
   "/",

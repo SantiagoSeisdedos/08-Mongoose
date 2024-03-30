@@ -1,3 +1,6 @@
+import jwt from "jsonwebtoken";
+
+import { JWT_SECRET } from "../config/config.js";
 import { daoUsers } from "../dao/daoInstance.js";
 import { errorStatusMap } from "../utils/errorCodes.js";
 import { emailService } from "./email/email.service.js";
@@ -104,9 +107,11 @@ class UserService {
     }
   }
 
-  async updatePassword(email, newPassword) {
+  async updatePassword(token, newPassword) {
     try {
-      const updatedPassword = await daoUsers.updatePassword(email, newPassword);
+      const decoded = jwt.verify(token, JWT_SECRET);
+
+      const updatedPassword = await daoUsers.updatePassword(decoded.email, newPassword);
       if (!updatedPassword) {
         const error = new Error("Password not updated");
         error.code = errorStatusMap.UNEXPECTED_ERROR;

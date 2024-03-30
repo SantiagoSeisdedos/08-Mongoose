@@ -4,5 +4,5 @@ import { PORT } from "./config/config.js";
 
 await connectMongoDB();
 
-const serverAPI = new ServerAPI();
+export const serverAPI = new ServerAPI();
 await serverAPI.startServer(PORT);

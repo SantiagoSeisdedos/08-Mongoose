@@ -48,4 +48,8 @@ export class ProductsDaoMongoose {
   async deleteMany(query) {
     throw new Error("NOT ILEMENTED");
   }
+
+  async count(filter) {
+    return await this.productsModel.countDocuments(filter);
+  }
 }
