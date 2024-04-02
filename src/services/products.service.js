@@ -1,3 +1,6 @@
+import path from "path";
+import fs from "fs";
+
 import { daoProducts } from "../dao/daoInstance.js";
 import { errorStatusMap } from "../utils/errorCodes.js";
 
@@ -156,12 +159,11 @@ class ProductsService {
         throw error;
       }
 
-      if (owner.rol === "admin") {
-        const deletedProduct = await daoProducts.deleteOne(id);
-        return deletedProduct;
-      }
+      // Comprobar si el usuario es administrador o el propietario del producto
+      const isAdmin = owner.rol === "admin";
+      const isOwner = owner && owner.email && owner.email === product.owner;
 
-      if (owner && owner.email && owner.email !== product.owner) {
+      if (!isAdmin && !isOwner) {
         const error = new Error(
           "No tienes permisos para eliminar este producto"
         );
@@ -169,6 +171,15 @@ class ProductsService {
         throw error;
       }
 
+      const currentDir = path.resolve();
+      const publicDir = path.resolve(currentDir, "public");
+
+      for (const imgPath of product.thumbnail) {
+        const finalPath = publicDir + imgPath;
+        fs.unlinkSync(finalPath);
+      }
+
+      // Eliminar el producto de la base de datos
       const deletedProduct = await daoProducts.deleteOne(id);
       return deletedProduct;
     } catch (error) {

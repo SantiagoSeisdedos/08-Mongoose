@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken";
+import path from "path";
+import fs from "fs";
 
 import { JWT_SECRET } from "../config/config.js";
 import { daoUsers } from "../dao/daoInstance.js";
@@ -55,9 +57,23 @@ class UserService {
     }
   }
 
-  async getUser(email) {
+  async getUserByEmail(email) {
     try {
       const user = await daoUsers.getUser(email);
+      if (!user) {
+        const error = new Error("User not found");
+        error.code = errorStatusMap.NOT_FOUND;
+        throw error;
+      }
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getUserById(id) {
+    try {
+      const user = await daoUsers.getUserById(id);
       if (!user) {
         const error = new Error("User not found");
         error.code = errorStatusMap.NOT_FOUND;
@@ -72,6 +88,20 @@ class UserService {
   async updateUser(email, userData) {
     try {
       const updatedUser = await daoUsers.updateUser(email, userData);
+      if (!updatedUser) {
+        const error = new Error("User not found");
+        error.code = errorStatusMap.NOT_FOUND;
+        throw error;
+      }
+      return updatedUser;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateRol(email, rol) {
+    try {
+      const updatedUser = await daoUsers.updateRol(email, rol);
       if (!updatedUser) {
         const error = new Error("User not found");
         error.code = errorStatusMap.NOT_FOUND;
@@ -99,7 +129,7 @@ class UserService {
 
   async resetPassword(email) {
     try {
-      await this.getUser(email);
+      await this.getUserByEmail(email);
       await daoUsers.sendPasswordResetEmail(email);
       return { message: "Email sent" };
     } catch (error) {
@@ -111,13 +141,80 @@ class UserService {
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
 
-      const updatedPassword = await daoUsers.updatePassword(decoded.email, newPassword);
+      const updatedPassword = await daoUsers.updatePassword(
+        decoded.email,
+        newPassword
+      );
       if (!updatedPassword) {
         const error = new Error("Password not updated");
         error.code = errorStatusMap.UNEXPECTED_ERROR;
         throw error;
       }
       return updatedPassword;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async uploadDocuments(uid, files) {
+    try {
+      const user = await daoUsers.getUserById(uid);
+
+      if (!user) {
+        const error = new Error("User not found");
+        error.code = errorStatusMap.NOT_FOUND;
+        throw error;
+      }
+
+      if (!user.documents) {
+        user.documents = [];
+      }
+
+      files.forEach((file) => {
+        user.documents.push({
+          name: file.originalname,
+          reference: file.path,
+        });
+      });
+
+      const updatedUser = await daoUsers.updateUser(user.email, {
+        documents: user.documents,
+      });
+
+      return updatedUser;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteDocument(userId, docId) {
+    try {
+      const user = await daoUsers.getUserById(userId);
+
+      if (!user) {
+        const error = new Error("User not found");
+        error.code = errorStatusMap.NOT_FOUND;
+        throw error;
+      }
+
+      const currentDir = path.resolve();
+
+      user.documents.forEach((doc) => {
+        if (doc._id.toString() === docId) {
+          const finalPath = `${currentDir}/${doc.reference}`;
+          fs.unlinkSync(finalPath);
+        }
+      });
+
+      const updatedDocuments = user.documents.filter(
+        (doc) => doc._id.toString() !== docId
+      );
+
+      const updatedUser = await daoUsers.updateUser(user.email, {
+        documents: updatedDocuments,
+      });
+
+      return updatedUser;
     } catch (error) {
       throw error;
     }

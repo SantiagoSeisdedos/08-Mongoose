@@ -1,4 +1,5 @@
 import "dotenv/config";
+import path from "path";
 import { Router } from "express";
 import axios from "axios";
 import swaggerJsdoc from "swagger-jsdoc";
@@ -85,9 +86,15 @@ webRouter.get("/images", (req, res) => {
   }
 });
 
-webRouter.post("/images", upload.single("image"), (req, res) => {
+webRouter.post("/images", upload.single("productImage"), (req, res) => {
   try {
-    if (req.file.filename) res.json({ url: req.file.filename });
+    if (req.file.filename) {
+      console.log("req.file.filename", req.file.filename);
+      const imageUrl = path.join("/products", req.file.filename);
+      res.json({ url: imageUrl });
+    } else {
+      throw new Error("No se recibió ninguna imagen");
+    }
   } catch (error) {
     logger.info(error);
     return res.status(500).json({ message: "Error uploading /image" });

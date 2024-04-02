@@ -41,6 +41,13 @@ const userSchema = new mongoose.Schema(
       ],
       default: "",
     },
+    documents: [
+      {
+        name: { type: String, required: true },
+        reference: { type: String, required: true },
+      },
+    ],
+    last_connection: { type: Date, default: null },
   },
   {
     strict: "throw",
@@ -115,7 +122,11 @@ const userSchema = new mongoose.Schema(
             error.code = errorStatusMap.UNAUTHORIZED;
             throw error;
           }
-          return user.toObject();
+
+          const last_connection = new Date();
+          await this.findOneAndUpdate(query, { last_connection });
+
+          return { ...user.toObject(), last_connection };
         } catch (error) {
           throw error;
         }
@@ -137,31 +148,6 @@ const userSchema = new mongoose.Schema(
       },
     },
   }
-  // statics: {
-  //   createOne: async function (userData) {
-  //     await this.create(userData);
-  //   },
-  //   readOne: async function (query) {
-  //     const userDoc = await this.findOne(query);
-  //     return userDoc.toPojo();
-  //   },
-  //   readMany: async function () {
-  //     const users = await this.find();
-  //     return users.map((user) => user.toPojo());
-  //   },
-  //   updateOne: async function (email, userData) {
-  //     await this.create(userData);
-  //   },
-  //   updateMany: async function (userData) {
-  //     await this.create(userData);
-  //   },
-  //   deleteOne: async function (email) {
-  //     await this.create(userData);
-  //   },
-  //   deleteMany: async function () {
-  //     await this.create(userData);
-  //   },
-  // },
 );
 
 export default userSchema;

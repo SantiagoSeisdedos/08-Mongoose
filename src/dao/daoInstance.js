@@ -45,7 +45,6 @@ const productsModel = model("products", productSchema);
 const usersModel = model("users", userSchema);
 const orderModel = model("orders", orderSchema);
 
-
 // Crear instancias de DAO para carritos y productos
 export const daoCarts = createDaoInstance(
   cartsModel,

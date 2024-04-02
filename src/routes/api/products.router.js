@@ -1,4 +1,6 @@
 import { Router } from "express";
+import passport from "passport";
+
 import {
   deleteProductController,
   getProductController,
@@ -12,7 +14,6 @@ import {
   validateUpdates,
 } from "../../middlewares/validations.js";
 import { isAuthorized } from "../../middlewares/authorization.js";
-import passport from "passport";
 
 export const productsRouter = Router();
 

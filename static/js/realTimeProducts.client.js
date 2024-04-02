@@ -15,7 +15,8 @@ const getCurrentUser = async () => {
 const uploadImage = async (imageFile) => {
   try {
     const formData = new FormData();
-    formData.append("image", imageFile);
+    formData.append("productImage", imageFile); // Cambiado a "productImage"
+
     const response = await fetch("/images", {
       method: "POST",
       body: formData,

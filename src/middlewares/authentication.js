@@ -58,11 +58,6 @@ passport.use(
     {
       jwtFromRequest: function (req) {
         var token = null;
-        console.log("00a jwtFromRequest Before if", req["signedCookies"]);
-        console.log(
-          "00b jwtFromRequest Before if",
-          req["signedCookies"]["authorization"]
-        );
         if (
           req &&
           req["signedCookies"] &&
@@ -71,14 +66,11 @@ passport.use(
           token = req["signedCookies"]["authorization"];
         }
 
-        console.log("01 jwtFromRequest After if", token);
-        console.log("02 jwtFromRequest After secretOrKey", JWT_SECRET);
         return token;
       },
       secretOrKey: JWT_SECRET,
     },
     (user, done) => {
-      console.log("04 jwt strategy", user);
       done(null, user);
     }
   )

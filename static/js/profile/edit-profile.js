@@ -1,6 +1,7 @@
 const formEdit = document.querySelector("form");
 const inputs = document.querySelectorAll("input");
 const emailSpan = document.querySelector("span");
+const toggleRoleButton = document.getElementById("toggleRoleButton");
 
 window.addEventListener("load", async (event) => {
   try {
@@ -16,6 +17,34 @@ window.addEventListener("load", async (event) => {
     inputs[0].innerHTML = user.name;
     inputs[1].innerHTML = user.lastName;
     emailSpan.innerHTML = user.email;
+    rolSpan.innerHTML = user.rol;
+
+    toggleRoleButton.addEventListener("click", async (event) => {
+      event.preventDefault();
+
+      try {
+        const response = await fetch(`/api/users/premium/${user.email}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            rol: user.rol === "user" ? "premium" : "user",
+          }),
+        });
+
+        if (response.ok) {
+          alert("Rol cambiado exitosamente");
+          window.location.reload();
+        } else {
+          const error = await response.json();
+          alert(error.message);
+        }
+      } catch (error) {
+        console.log(error);
+        alert("Error al cambiar el rol");
+      }
+    });
   } catch (error) {
     alert("Error loading /edit");
   }

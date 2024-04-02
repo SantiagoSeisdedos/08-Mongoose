@@ -4,7 +4,7 @@ import {
   deleteAuthToken,
 } from "../services/sessions.service.js";
 
-export async function sesionControllerLoginUser(req, res, next) {
+export async function loginUserSessionController(req, res, next) {
   try {
     const user = await authenticateUser(req.body);
     req.user = user;
@@ -23,6 +23,6 @@ export async function sesionControllerLoginUser(req, res, next) {
   }
 }
 
-export function sessionControllerLogoutUser(req, res) {
+export function logoutUserSessionController(req, res) {
   return deleteAuthToken(req, res);
 }

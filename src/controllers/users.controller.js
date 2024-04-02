@@ -16,10 +16,28 @@ export const UserController = {
   async getCurrentUser(req, res, next) {
     try {
       const user = await usersService.getCurrentUser(req.user.email);
-      const { name, lastName, email, rol, profilePicture, cart } = user;
+      const {
+        name,
+        lastName,
+        email,
+        rol,
+        profilePicture,
+        cart,
+        _id,
+        documents,
+      } = user;
 
       return res.json({
-        data: { name, lastName, email, rol, profilePicture, cart },
+        data: {
+          name,
+          lastName,
+          email,
+          rol,
+          profilePicture,
+          cart,
+          _id,
+          documents,
+        },
       });
     } catch (error) {
       next(error);
@@ -35,9 +53,18 @@ export const UserController = {
     }
   },
 
-  async getUser(req, res, next) {
+  async getUserByEmail(req, res, next) {
     try {
-      const user = await usersService.getUser(req.params.email);
+      const user = await usersService.getUserByEmail(req.params.email);
+      return res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getUserById(req, res, next) {
+    try {
+      const user = await usersService.getUserById(req.params.id);
       return res.json(user);
     } catch (error) {
       next(error);
@@ -48,6 +75,18 @@ export const UserController = {
     try {
       const user = await usersService.updateUser(req.user.email, req.body);
       return res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateRol(req, res, next) {
+    try {
+      const updatedUser = await usersService.updateRol(
+        req.params.email,
+        req.body.rol
+      );
+      return res.json(updatedUser);
     } catch (error) {
       next(error);
     }
@@ -72,6 +111,31 @@ export const UserController = {
       );
 
       return res.json(updatedPassword);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async uploadDocuments(req, res, next) {
+    try {
+      const { uid } = req.params;
+      const files = req.files;
+
+      const updatedUser = await usersService.uploadDocuments(uid, files);
+
+      return res.status(200).json(updatedUser);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async deleteDocument(req, res, next) {
+    try {
+      const { id, doc } = req.params;
+
+      const updatedUser = await usersService.deleteDocument(id, doc);
+
+      return res.status(200).json(updatedUser);
     } catch (error) {
       next(error);
     }
