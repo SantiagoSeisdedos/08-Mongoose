@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken";
+import path from "path";
+import fs from "fs";
 
 import { JWT_SECRET } from "../config/config.js";
 import { daoUsers } from "../dao/daoInstance.js";
@@ -195,8 +197,17 @@ class UserService {
         throw error;
       }
 
+      const currentDir = path.resolve();
+
+      user.documents.forEach((doc) => {
+        if (doc._id.toString() === docId) {
+          const finalPath = `${currentDir}/${doc.reference}`;
+          fs.unlinkSync(finalPath);
+        }
+      });
+
       const updatedDocuments = user.documents.filter(
-        (document) => document._id.toString() !== docId
+        (doc) => doc._id.toString() !== docId
       );
 
       const updatedUser = await daoUsers.updateUser(user.email, {
