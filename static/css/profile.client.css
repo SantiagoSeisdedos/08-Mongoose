@@ -1,0 +1,119 @@
+/* profile.client.css */
+#profileContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  background-color: #101010;
+  color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  justify-content: start;
+}
+
+#imageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+#profilePicture {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-top: 20px;
+}
+
+#profileInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+#profileInfo div {
+  margin-bottom: 10px;
+}
+
+#profileInfo label {
+  font-weight: bold;
+}
+
+#profileInfo span {
+  margin-left: 10px;
+}
+
+#profileInfo img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+#documentsContainer {
+  margin-top: 40px;
+}
+
+#documentsContainer h2 {
+  margin-bottom: 10px;
+}
+
+#documentsList {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  background-color: #101010;
+}
+
+.documentItem {
+  margin-bottom: 5px;
+  padding: 20px;
+  background-color: #404040;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: row;
+}
+
+.documentDataContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.document-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.documentImage {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.documentName {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.deleteButton {
+  margin-top: 4px;
+  background-color: #ff0606;
+  color: #fff;
+  border: none;
+  padding: 4;
+  border-radius: 5px;
+  cursor: pointer;
+}

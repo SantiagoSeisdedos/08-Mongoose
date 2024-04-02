@@ -3,7 +3,16 @@ import fs from "fs";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadPath = "./public";
+    let uploadPath;
+
+    if (file.fieldname === "profileImage") {
+      uploadPath = "./public/profiles";
+    } else if (file.fieldname === "productImage") {
+      uploadPath = "./public/products";
+    } else {
+      uploadPath = "./public/documents";
+    }
+
     fs.access(uploadPath, (err) => {
       if (err) {
         fs.mkdir(uploadPath, { recursive: true }, (err) => {

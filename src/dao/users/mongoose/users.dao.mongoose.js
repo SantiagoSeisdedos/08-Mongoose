@@ -30,8 +30,12 @@ export class UsersDaoMongoose {
     return await this.usersModel.find().lean();
   }
 
-  async getUser(email) {
+  async getUserByEmail(email) {
     return await this.usersModel.findOne({ email }).lean();
+  }
+
+  async getUserById(id) {
+    return await this.usersModel.findById(id).lean();
   }
 
   async authentication(credentials) {
@@ -45,20 +49,17 @@ export class UsersDaoMongoose {
   }
 
   async updateUser(email, userData) {
-    try {
-      const updatedUser = await this.usersModel
-        .findOneAndUpdate({ email }, userData, { new: true })
-        .lean();
+    const updatedUser = await this.usersModel
+      .findOneAndUpdate({ email }, userData, { new: true })
+      .lean();
+    return updatedUser;
+  }
 
-      if (!updatedUser) {
-        const error = new Error("User not found");
-        error.code = errorStatusMap.NOT_FOUND;
-        throw error;
-      }
-      return updatedUser;
-    } catch (error) {
-      throw error;
-    }
+  async updateRol(email, rol) {
+    const updatedUser = await this.usersModel
+      .findOneAndUpdate({ email }, { rol }, { new: true })
+      .lean();
+    return updatedUser;
   }
 
   async sendPasswordResetEmail(email) {

@@ -1,11 +1,17 @@
 import { Router } from "express";
+import passport from "passport";
+
 import {
-  sesionControllerLoginUser,
-  sessionControllerLogoutUser,
+  loginUserSessionController,
+  logoutUserSessionController,
 } from "../../controllers/sessions.controller.js";
 
 export const sessionsRouter = Router();
 
-sessionsRouter.post("/", sesionControllerLoginUser);
+sessionsRouter.post("/", loginUserSessionController);
 
-sessionsRouter.delete("/current", sessionControllerLogoutUser);
+sessionsRouter.delete(
+  "/current",
+  passport.authenticate("jwt", { failWithError: true, session: false }),
+  logoutUserSessionController
+);

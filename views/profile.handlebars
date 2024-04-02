@@ -1,13 +1,54 @@
 <h1>Perfil</h1>
 
-<ul id="profileUL">
-  <li>Nombre: <span id="nameSpan"></span></li>
-  <li>Apellido: <span id="lastNameSpan"></span></li>
-  <li>Correo electronico: <span id="emailSpan"></span></li>
-  <li>Rol: <span id="rolSpan"></span></li>
-</ul>
+<div id="profileContainer">
 
-<button id="logoutButton" type="button">Logout</button>
-<a type="button" href="/edit">Editar mis datos</a>
+  {{! LEFT DATA }}
+  <div id="profileInfo">
 
-<script src="js/profile/profile.js"></script>
+    <div>
+      <label for="name">Nombre: <span id="name"></span></label>
+    </div>
+
+    <div>
+      <label for="lastName">Apellido: <span id="lastName"></span></label>
+    </div>
+
+    <div>
+      <label for="email">Correo Electrónico: <span id="email"></span></label>
+    </div>
+
+    <div>
+      <label for="rol">Rol: <span id="rol"></span></label>
+    </div>
+  </div>
+
+  {{! AVATAR }}
+  <div id="imageContainer">
+    <div>
+      <label for="profilePicture">Foto de Perfil:</label>
+      <img id="profilePicture" alt="Foto de Perfil" />
+    </div>
+  </div>
+
+</div>
+
+{{! DOC SECTION }}
+<div id="documentsContainer">
+  <h2>Documentos</h2>
+  <div id="documentsList">
+
+  </div>
+</div>
+
+<form id="uploadForm">
+  <input type="file" name="files" multiple />
+  <button id="uploadButton" type="submit" disabled>Subir Documentos</button>
+</form>
+
+<div style="display: flex; width: 30%; gap: 20px;">
+  <button id="logoutButton" type="button">Logout</button>
+  <button id="editProfile" type="button">
+    <a type="button" href="/edit">Editar perfil</a>
+  </button>
+</div>
+<script src="js/profile/profile.js"></script>`

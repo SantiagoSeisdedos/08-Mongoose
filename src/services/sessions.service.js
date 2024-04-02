@@ -18,7 +18,10 @@ export async function authenticateUser(credentials) {
   }
 }
 
-export function deleteAuthToken(req, res, next) {
+export async function deleteAuthToken(req, res, next) {
+  await daoUsers.updateUser(req.user.email, {
+    last_connection: new Date(),
+  });
   return deleteTokenFromCookie(req, res, next).status(200).json({
     status: "success",
     message: "Token deleted successfully!",
