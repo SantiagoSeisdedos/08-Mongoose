@@ -12,19 +12,6 @@ async function getProducts() {
     .catch((err) => logger.info(err.message));
 }
 
-async function deleteProduct(id) {
-  return await axios
-    .delete(`${BASE_URL}/api/products/${id}`)
-    .then((res) => res.data)
-    .catch((err) =>
-      logger.info("deleteProduct error: ", {
-        message: err.message,
-        data: err.response.data.error,
-        status: err.response.status,
-      })
-    );
-}
-
 async function getMessages() {
   return await axios
     .get(`${BASE_URL}/api/messages`)
@@ -32,7 +19,6 @@ async function getMessages() {
     .catch((err) => logger.info("Error on getMessages socket", err));
 }
 
-// Delete Message
 async function deleteMessage(id) {
   return await axios
     .delete(`${BASE_URL}/api/messages/${id}`)
@@ -50,10 +36,8 @@ async function addMessage({ username, text }) {
 
 export function onConnection(socketServer) {
   return async function (socket) {
-    // User Conected
     socket.broadcast.emit("new-user", socket.handshake.auth.username);
 
-    // User Disconected
     socket.on("disconnecting", () => {
       socket.broadcast.emit(
         "user-disconnected",
@@ -61,30 +45,23 @@ export function onConnection(socketServer) {
       );
     });
 
-    // Get products
     socket.emit("getProducts", await getProducts());
 
-    // Delete product
     socket.on("deleteProduct", async (id) => {
-      // await deleteProduct(id);
       socket.emit("getProducts", await getProducts());
     });
 
-    // Add product
     socket.on("addProduct", async () => {
       socket.emit("getProducts", await getProducts());
     });
 
-    // Get Chat Messages
     socket.emit("getMessages", await getMessages());
 
-    // Delete Message
     socket.on("deleteMessage", async (id) => {
       await deleteMessage(id);
       socket.emit("getMessages", await getMessages());
     });
 
-    // Add Message to DB
     socket.on("addMessage", async (message) => {
       await addMessage(message);
       socket.emit("getMessages", await getMessages());
