@@ -58,7 +58,7 @@ export const SWAGGER_CONFIG = {
     },
     servers: [
       {
-        url: "http://localhost:8080",
+        url: BASE_URL,
       },
     ],
   },

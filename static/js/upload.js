@@ -13,7 +13,7 @@ form.addEventListener("submit", async (event) => {
   const { url } = await response.json();
   // Mostrar la imagen en una nueva pestaña si la URL e xiste
   if (url) {
-    return window.open(`http://localhost:8080/${url}`, "_blank");
+    return window.open(`/${url}`, "_blank");
   } else {
     return alert("No se ha recibido la URL de la imagen");
   }

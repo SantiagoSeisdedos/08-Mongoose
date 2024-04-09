@@ -3,7 +3,7 @@ window.addEventListener("load", async () => {
     const urlParams = window.location.href;
     const cartId = urlParams.split("/").pop();
 
-    const response = await fetch(`http://localhost:8080/api/orders/${cartId}`);
+    const response = await fetch(`/api/orders/${cartId}`);
     if (!response.ok) {
       throw new Error("Failed to fetch cart data");
     }
@@ -35,7 +35,7 @@ document.getElementById("confirmButton").addEventListener("click", async () => {
   const cartId = urlParams.split("/").pop();
 
   try {
-    const response = await fetch(`http://localhost:8080/api/orders/${cartId}`, {
+    const response = await fetch(`/api/orders/${cartId}`, {
       method: "POST",
     });
 
