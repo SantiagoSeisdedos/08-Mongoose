@@ -12,26 +12,26 @@ import {
 import { usersService } from "../services/users.service.js";
 
 // Passport Github strategy
-passport.use(
-  "githubLogin",
-  new GithubStrategy(
-    {
-      clientID: GITHUB_CLIENT_ID,
-      clientSecret: GITHUB_CLIENT_SECRET,
-      callbackURL: GITHUB_CALLBACK_URL,
-    },
-    async (_, __, profile, done) => {
-      let user = await usersService.getUserByEmail({ email: profile.username });
-      if (!user) {
-        user = await userModel.create({
-          name: profile.displayName,
-          email: profile.username,
-        });
-      }
-      done(null, user.toObject());
-    }
-  )
-);
+// passport.use(
+//   "githubLogin",
+//   new GithubStrategy(
+//     {
+//       clientID: GITHUB_CLIENT_ID,
+//       clientSecret: GITHUB_CLIENT_SECRET,
+//       callbackURL: GITHUB_CALLBACK_URL,
+//     },
+//     async (_, __, profile, done) => {
+//       let user = await usersService.getUserByEmail({ email: profile.username });
+//       if (!user) {
+//         user = await userModel.create({
+//           name: profile.displayName,
+//           email: profile.username,
+//         });
+//       }
+//       done(null, user.toObject());
+//     }
+//   )
+// );
 
 // Passport JWT strategy
 passport.use(
