@@ -22,13 +22,6 @@ usersRouter.get(
   UserController.getCurrentUser
 );
 
-usersRouter.get(
-  "/",
-  passport.authenticate("jwt", { failWithError: true, session: false }),
-  isAuthorized(["admin"]),
-  UserController.getUsers
-);
-
 usersRouter.get("/:email", UserController.getUserByEmail);
 usersRouter.get("/:id", UserController.getUserById);
 
@@ -45,3 +38,26 @@ usersRouter.put(
 );
 
 usersRouter.delete("/:id/documents/:doc", UserController.deleteDocument);
+
+// ==============================
+// Endpoints de la entrega del proyecto final
+usersRouter.get(
+  "/",
+  // passport.authenticate("jwt", { failWithError: true, session: false }),
+  // isAuthorized(["admin"]),
+  UserController.getUsers
+);
+
+usersRouter.delete(
+  "/",
+  // passport.authenticate("jwt", { failWithError: true, session: false }),
+  // isAuthorized(["admin"]),
+  UserController.deleteUsers
+);
+
+usersRouter.delete(
+  "/:email",
+  // passport.authenticate("jwt", { failWithError: true, session: false }),
+  // isAuthorized(["admin"]),
+  UserController.deleteUser
+);

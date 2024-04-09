@@ -38,6 +38,12 @@ export class UsersDaoMongoose {
     return await this.usersModel.findById(id).lean();
   }
 
+  async deleteUser(email) {
+    return await this.usersModel.findOneAndDelete({
+      email,
+    });
+  }
+
   async authentication(credentials) {
     const user = await this.usersModel.authentication(credentials);
     return user;

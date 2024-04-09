@@ -45,7 +45,6 @@ const enterChat = (username) => {
       username,
     },
   });
-  logger.info("Cliente conectado al chat! Bienvenido", username);
 
   // User Conected
   socket.on("new-user", (username) => {

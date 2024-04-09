@@ -3,6 +3,7 @@ import fs from "fs";
 
 import { daoProducts } from "../dao/daoInstance.js";
 import { errorStatusMap } from "../utils/errorCodes.js";
+import { emailService } from "./email/email.service.js";
 
 class ProductsService {
   async readMany({ limit = 100, page = 1, sort, query }) {
@@ -123,18 +124,18 @@ class ProductsService {
         throw error;
       }
 
-      if (owner.rol === "admin") {
-        const updatedProduct = await daoProducts.updateOne(id, updates);
-        return updatedProduct;
-      }
+      // if (owner.rol === "admin") {
+      //   const updatedProduct = await daoProducts.updateOne(id, updates);
+      //   return updatedProduct;
+      // }
 
-      if (owner && owner.email && owner.email !== product.owner) {
-        const error = new Error(
-          "No tienes permisos para actualizar este producto"
-        );
-        error.code = errorStatusMap.FORBIDDEN;
-        throw error;
-      }
+      // if (owner && owner.email && owner.email !== product.owner) {
+      //   const error = new Error(
+      //     "No tienes permisos para actualizar este producto"
+      //   );
+      //   error.code = errorStatusMap.FORBIDDEN;
+      //   throw error;
+      // }
 
       const updatedProduct = await daoProducts.updateOne(id, updates);
       return updatedProduct;
@@ -143,7 +144,7 @@ class ProductsService {
     }
   }
 
-  async deleteOne(id, owner) {
+  async deleteOne(id, requestingUser) {
     try {
       if (!id) {
         const error = new Error("El ID es requerido");
@@ -159,9 +160,11 @@ class ProductsService {
         throw error;
       }
 
-      // Comprobar si el usuario es administrador o el propietario del producto
-      const isAdmin = owner.rol === "admin";
-      const isOwner = owner && owner.email && owner.email === product.owner;
+      const isAdmin = requestingUser.rol === "admin";
+      const isOwner =
+        requestingUser &&
+        requestingUser.email &&
+        requestingUser.email === product.owner;
 
       if (!isAdmin && !isOwner) {
         const error = new Error(
@@ -171,6 +174,8 @@ class ProductsService {
         throw error;
       }
 
+      const deletedProduct = await daoProducts.deleteOne(id);
+
       const currentDir = path.resolve();
       const publicDir = path.resolve(currentDir, "public");
 
@@ -179,8 +184,14 @@ class ProductsService {
         fs.unlinkSync(finalPath);
       }
 
-      // Eliminar el producto de la base de datos
-      const deletedProduct = await daoProducts.deleteOne(id);
+      if (isAdmin || isOwner) {
+        await emailService.send(
+          product.owner,
+          "Producto eliminado",
+          `Tu producto "${product.title} - (${product.code})" ha sido eliminado`
+        );
+      }
+
       return deletedProduct;
     } catch (error) {
       throw error;

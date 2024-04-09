@@ -11,19 +11,33 @@ formLogin?.addEventListener("submit", async (event) => {
     });
 
     if (response.status === 201) {
-      const sesion = await response.json();
+      const session = await response.json();
       Swal.fire({
-        title: "Bienvenido " + sesion.name + "!",
+        title: "Bienvenido " + (session.name || session.email) + "!",
         icon: "success",
-        confirmButtonText: "Ingresar",
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false,
       }).then((result) => {
         window.location.href = "/profile";
       });
     } else {
       const error = await response.json();
-      throw new Error(error.message || error);
+      if (error.message.includes("UNAUTHORIZED")) {
+        Swal.fire({
+          title: "Error!",
+          text: "Error al iniciar sesión. Por favor, inténtelo de nuevo",
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+      } else throw new Error(error.message || error);
     }
   } catch (error) {
-    alert(error);
+    Swal.fire({
+      title: "Error!",
+      text: "Algo salio mal. Por favor, inténtelo de nuevo",
+      icon: "error",
+      confirmButtonText: "Ok",
+    });
   }
 });

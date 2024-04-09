@@ -23,9 +23,9 @@ usersRouter.get("/resetPassword", (req, res) => {
   }
 });
 
-usersRouter.get("/edit", (req, res) => {
+usersRouter.get("/editProfile", (req, res) => {
   try {
-    return res.render("edit.handlebars", {
+    return res.render("editProfile.handlebars", {
       pageTitle: "Edit Profiles",
     });
   } catch (error) {
@@ -53,5 +53,16 @@ usersRouter.get("/recoverAccount", (req, res) => {
   } catch (error) {
     logger.info(error);
     return res.status(500).json({ message: "Error loading /recoverAccount" });
+  }
+});
+
+usersRouter.get("/checkout/:cartId", (req, res) => {
+  try {
+    return res.render("checkout.handlebars", {
+      pageTitle: "Checkout",
+    });
+  } catch (error) {
+    logger.info(error);
+    return res.status(500).json({ message: "Error loading /checkout" });
   }
 });

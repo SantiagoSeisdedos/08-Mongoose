@@ -16,8 +16,8 @@ export class CartsDaoMongoose {
     return toPOJO(cart);
   }
 
-  async createOne() {
-    const cart = await this.cartModel.create({});
+  async createOne(cartData) {
+    const cart = await this.cartModel.create(cartData);
     return toPOJO(cart);
   }
 

@@ -81,8 +81,8 @@ export async function deleteProductController(req, res, next) {
   try {
     const { id } = req.params;
     const products = await productsService.deleteOne(id, {
-      email: req.user.email,
-      rol: req.user.rol,
+      email: req.user.email, // Email del usuario autenticado
+      rol: req.user.rol, // Rol del usuario autenticado
     });
 
     res.json({
