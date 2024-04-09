@@ -14,7 +14,7 @@
     </div>
 
     <div>
-      <label for="email">Correo Electrónico: <span id="email"></span></label>
+      <label for="email">Email: <span id="email"></span></label>
     </div>
 
     <div>
@@ -45,10 +45,21 @@
   <button id="uploadButton" type="submit" disabled>Subir Documentos</button>
 </form>
 
-<div style="display: flex; width: 30%; gap: 20px;">
-  <button id="logoutButton" type="button">Logout</button>
-  <button id="editProfile" type="button">
-    <a type="button" href="/edit">Editar perfil</a>
-  </button>
+<div style="display: flex; width: 100%; gap: 20px;">
+  <a id="usersTable" type="button" href="/usersTable" hidden>
+    <button type="button">
+      Tabla de Usuarios
+    </button>
+  </a>
+  <a type="button">
+    <button id="logoutButton" type="button">Logout</button>
+  </a>
+  <a type="button" href="/editProfile">
+    <button id="editProfile" type="button">
+      Editar perfil
+    </button>
+  </a>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="js/profile/profile.js"></script>

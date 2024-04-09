@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
         {
           _id: {
             type: String,
-            ref: "cart",
+            ref: "carts",
             required: true,
             default: randomUUID,
           },

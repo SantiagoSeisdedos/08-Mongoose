@@ -140,4 +140,22 @@ export const UserController = {
       next(error);
     }
   },
+
+  async deleteUsers(req, res, next) {
+    try {
+      const response = await usersService.deleteUsers(req.body);
+      return res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async deleteUser(req, res, next) {
+    try {
+      const response = await usersService.deleteUser(req.params.email);
+      return res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  },
 };

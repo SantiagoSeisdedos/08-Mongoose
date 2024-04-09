@@ -34,25 +34,31 @@ const uploadImage = async (imageFile) => {
   }
 };
 
-const updateHeader = (username) => {
+const updateHeader = (user) => {
   const productHeader = document.getElementById("productHeader");
   if (productHeader) {
-    productHeader.textContent = `Listado de Productos - ${username}`;
+    productHeader.textContent = `Listado de Productos - ${
+      user.name || user.email
+    } - ${user.rol}`;
+  }
+  const checkoutButton = document.getElementById("checkoutButton");
+  if (checkoutButton) {
+    checkoutButton.addEventListener("click", () => {
+      window.location.href = `/checkout/${user.cart[0]._id}`;
+    });
   }
 };
 
-const sendProductData = async (username) => {
+const sendProductData = async (user) => {
   const socket = io({
     auth: {
-      username: username || "admin",
+      username: user.name || "admin",
     },
   });
 
-  // send message/product
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    // Obtén los valores de los campos del formulario dentro del evento submit
     const title = document.getElementById("productTitle").value;
     const description = document.getElementById("productDescription").value;
     const price = document.getElementById("productPrice").value;
@@ -140,7 +146,7 @@ const sendProductData = async (username) => {
       const productItem = document.createElement("div");
       productItem.classList.add("product-item");
 
-      const imgContainer = document.createElement("div"); // Contenedor para la imagen
+      const imgContainer = document.createElement("div");
       const img = document.createElement("img");
       img.src = product.thumbnail;
       img.alt = product.title;
@@ -158,12 +164,58 @@ const sendProductData = async (username) => {
 
       const title = document.createElement("p");
       title.textContent = product.title;
+      title.classList.add("product-title");
 
       const price = document.createElement("p");
       price.textContent = `$${product.price}`;
+      price.classList.add("product-price");
 
       const owner = document.createElement("p");
-      owner.textContent = `${product.owner}`;
+      owner.textContent = `OWNER: ${product.owner}`;
+      owner.classList.add("product-owner");
+
+      const addToCartButton = document.createElement("button");
+      addToCartButton.textContent = "Agregar al carrito";
+
+      addToCartButton.addEventListener("click", () => {
+        fetch(
+          `http://localhost:8080/api/carts/${user.cart[0]._id}/product/${product._id}`,
+          {
+            method: "POST",
+            credentials: "include",
+          }
+        )
+          .then((res) => {
+            if (res.status === 401 || res.status === 403) {
+              throw new Error(
+                "No estás autorizado para agregar este producto al carrito"
+              );
+            }
+            if (!res.ok) {
+              throw new Error(
+                "Error al agregar el producto al carrito: " + res.statusText
+              );
+            }
+            return res.json();
+          })
+          .then((res) => {
+            Swal.fire({
+              title: "Producto agregado al carrito correctamente",
+              icon: "success",
+              confirmButtonText: "Ok",
+            }).then(() => {
+              window.location.reload();
+            });
+          })
+          .catch((err) => {
+            Swal.fire({
+              title: "Ocurrió un error al agregar el producto al carrito",
+              text: err.message,
+              icon: "error",
+              confirmButtonText: "Ok",
+            });
+          });
+      });
 
       // Delete Product
       const deleteButton = document.createElement("button");
@@ -218,6 +270,7 @@ const sendProductData = async (username) => {
       productItem.appendChild(title);
       productItem.appendChild(price);
       productItem.appendChild(owner);
+      productItem.appendChild(addToCartButton);
       productItem.appendChild(deleteButton);
 
       productList.appendChild(productItem);
@@ -225,31 +278,7 @@ const sendProductData = async (username) => {
   });
 };
 
-// User Conected
-// socket.on("new-user", (username) => {
-//   Swal.fire({
-//     text: `Bienvenido ${username}`,
-//     toast: true,
-//     position: "top-right",
-//     timer: 2500,
-//     timerProgressBar: true,
-//     showConfirmButton: false,
-//   });
-// });
-
-// User Disconected
-// socket.on("user-disconnected", (username) => {
-//   Swal.fire({
-//     text: `Te vamos a extrañar ${username}! Esperamos que vuelvas pronto`,
-//     toast: true,
-//     position: "top-right",
-//     timer: 2500,
-//     timerProgressBar: true,
-//     showConfirmButton: false,
-//   });
-// });
-
 getCurrentUser().then((user) => {
-  updateHeader(`${user.email} (${user.rol})`);
-  sendProductData(user.email);
+  updateHeader(user);
+  sendProductData(user);
 });

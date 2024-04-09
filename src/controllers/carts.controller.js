@@ -19,18 +19,8 @@ export async function getCartsController(req, res, next) {
 export async function getCartController(req, res, next) {
   try {
     const { id } = req.params;
-    if (!id) {
-      const error = new Error("El ID es requerido");
-      error.code = errorStatusMap.INCORRECT_DATA;
-      throw error;
-    }
-
     const cart = await cartsService.readOne(id);
-    if (!cart) {
-      const error = new Error(`No se encontró ningún carrito con el ID ${id}`);
-      error.code = errorStatusMap.NOT_FOUND;
-      throw error;
-    }
+
     res.status(200).json(cart);
   } catch (error) {
     next(error);
@@ -58,7 +48,7 @@ export async function addProductToCartController(req, res, next) {
     const { quantity = 1 } = req.body;
 
     const updatedCart = await cartsService.addProductToCart(id, pid, quantity);
-    res.json(updatedCart);
+    res.status(200).json(updatedCart);
   } catch (error) {
     next(error);
   }

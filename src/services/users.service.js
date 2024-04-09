@@ -127,6 +127,42 @@ class UserService {
     }
   }
 
+  async deleteUsers() {
+    try {
+      const users = await daoUsers.getUsers();
+      if (!users) {
+        const error = new Error("No users found");
+        error.code = errorStatusMap.NOT_FOUND;
+        throw error;
+      }
+
+      // Aca vamos a calcular entre todos los users, cuales son los inactivos
+      const currentDate = new Date();
+      const inactiveUsers = users.filter((user) => {
+        const lastConnection = new Date(user.last_connection);
+        const timeDifference = currentDate.getTime() - lastConnection.getTime();
+        // Definir el tiempo de inactividad en milisegundos
+        // Para pruebas, podemos usar 1 minuto (60000), luego cambiar a 30 minutos (1800000)
+        // y finalmente a 48 horas (172800000)
+        // const inactiveTime = 60000; // 1 minuto para pruebas
+        // const inactiveTime = 1800000; // 30 minutos
+        const inactiveTime = 172800000; // 48 horas
+        return timeDifference > inactiveTime;
+      });
+
+      inactiveUsers.forEach(async (user) => {
+        await daoUsers.deleteUser(user.email);
+        await emailService.send(
+          user.email,
+          "Cuenta eliminada",
+          "Tu cuenta ha sido eliminada por inactividad"
+        );
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async resetPassword(email) {
     try {
       await this.getUserByEmail(email);

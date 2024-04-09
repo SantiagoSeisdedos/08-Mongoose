@@ -12,12 +12,20 @@ window.addEventListener("load", async () => {
     const response = await fetch("/api/users/current");
 
     if (response.status === 403 || response.status === 401) {
-      alert("No autorizado!");
+      Swal.fire({
+        title: "Error!",
+        text: "No autorizado!",
+        icon: "error",
+        confirmButtonText: "Ok",
+      }).then(() => {
+        window.location.href = "/login";
+      });
+
       return (window.location.href = "/login");
     }
 
     const result = await response.json();
-    user = result.data; // Cambiado de result.payload a result.data
+    user = result.data;
 
     document.getElementById("name").textContent = user.name;
     document.getElementById("lastName").textContent = user.lastName;
@@ -28,9 +36,6 @@ window.addEventListener("load", async () => {
     documentsList.innerHTML = "";
 
     for (const userDocument of user.documents) {
-
-      console.log(userDocument)
-
       const docItem = document.createElement("div");
       docItem.classList.add("documentItem");
 
@@ -53,10 +58,8 @@ window.addEventListener("load", async () => {
       docName.classList.add("documentName");
 
       documentDataContainer.appendChild(docName);
-      // documentDataContainer.appendChild(docImage);
 
       documentsList.appendChild(docItem);
-      // docItem.appendChild(docName);
       docItem.appendChild(docImage);
 
       const deleteButton = document.createElement("button");
@@ -64,36 +67,71 @@ window.addEventListener("load", async () => {
       deleteButton.classList.add("deleteButton");
       deleteButton.addEventListener("click", async () => {
         try {
-          const response = await fetch(`/api/users/${user._id}/documents/${userDocument._id}`, {
-            method: "DELETE",
-          });
+          const response = await fetch(
+            `/api/users/${user._id}/documents/${userDocument._id}`,
+            {
+              method: "DELETE",
+            }
+          );
 
           if (response.status === 200) {
-            alert("Documento eliminado exitosamente!");
-            window.location.reload();
+            Swal.fire({
+              text: `Documento eliminado exitosamente`,
+              toast: true,
+              position: "top-right",
+              timer: 1500,
+              timerProgressBar: true,
+              showConfirmButton: false,
+            }).then(() => {
+              window.location.reload();
+            });
           } else {
             const error = await response.json();
             throw new Error(error.message);
           }
         } catch (error) {
-          console.error("Error deleting document:", error);
-          alert("Error al eliminar documento: " + error.message);
+          Swal.fire({
+            text: `Error al eliminar documento: ${error.message}`,
+            toast: true,
+            position: "top-right",
+            timer: 2500,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            icon: "error",
+          });
         }
       });
 
+      if (user.rol === "admin") {
+        document.getElementById("usersTable").removeAttribute("hidden");
+      }
+
       documentDataContainer.appendChild(deleteButton);
       docItem.appendChild(documentDataContainer);
-      
     }
 
     logoutButton.addEventListener("click", logout);
   } catch (error) {
     if (error.message === "Unauthorized") {
-      alert("No autorizado!");
+      Swal.fire({
+        title: "Error!",
+        text: "No autorizado!",
+        icon: "error",
+        confirmButtonText: "Ok",
+      }).then(() => {
+        window.location.href = "/login";
+      });
+
       return (window.location.href = "/login");
     } else {
-      console.log(error);
-      alert("Error loading /profile" + error.message || error);
+      Swal.fire({
+        title: "Error!",
+        text: "Algo salió mal. Por favor, inténtelo de nuevo",
+        icon: "error",
+        confirmButtonText: "Ok",
+      }).then(() => {
+        window.location.href = "/login";
+      });
     }
   }
 });
@@ -105,15 +143,29 @@ const logout = async (event) => {
     });
 
     if (response.status === 200) {
-      alert("Logout successful!");
-      window.location.href = "/login";
+      Swal.fire({
+        title: "Sesión cerrada",
+        text: "Hasta luego!",
+        icon: "success",
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      }).then(() => {
+        window.location.href = "/login";
+      });
     } else {
       const error = await response.json();
       throw new Error(error);
     }
   } catch (error) {
-    console.error("profile catch", error);
-    alert(error.message);
+    Swal.fire({
+      title: "Error!",
+      text: "Error al cerrar sesión. Por favor, inténtelo de nuevo",
+      icon: "error",
+      confirmButtonText: "Ok",
+    }).then(() => {
+      window.location.href = "/login";
+    });
   }
 };
 
@@ -142,14 +194,29 @@ uploadForm.addEventListener("submit", async (event) => {
     });
 
     if (response.status === 200) {
-      alert("Documentos subidos exitosamente!");
-      window.location.reload();
+      Swal.fire({
+        text: `Documentos subidos exitosamente!`,
+        toast: true,
+        position: "top-right",
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      }).then(() => {
+        window.location.reload();
+      });
     } else {
       const error = await response.json();
       throw new Error(error.message);
     }
   } catch (error) {
-    console.error("Error uploading documents:", error);
-    alert("Error al subir documentos: " + error.message);
+    Swal.fire({
+      text: `Error al subir documentos: ${error.message}`,
+      toast: true,
+      position: "top-right",
+      timer: 2000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+      icon: "error",
+    });
   }
 });

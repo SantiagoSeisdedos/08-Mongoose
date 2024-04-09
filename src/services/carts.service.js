@@ -47,7 +47,7 @@ class CartsService {
     }
   }
 
-  async addProductToCart(cartId, productId, quantity) {
+  async addProductToCart(cartId = "123", productId, quantity) {
     try {
       if (!cartId || !productId || !quantity) {
         const error = new Error("Se requieren cartId, productId y quantity.");
@@ -55,10 +55,9 @@ class CartsService {
         throw error;
       }
 
-      const cart = await daoCarts.readOne(cartId);
-      if (!cart) {
-        const error = new Error("Carrito no encontrado");
-        error.code = errorStatusMap.NOT_FOUND;
+      if (isNaN(quantity)) {
+        const error = new Error("quantity debe ser un número.");
+        error.code = errorStatusMap.INCORRECT_DATA;
         throw error;
       }
 
@@ -69,14 +68,23 @@ class CartsService {
         throw error;
       }
 
-      if (isNaN(quantity)) {
-        const error = new Error("quantity debe ser un número.");
-        error.code = errorStatusMap.INCORRECT_DATA;
-        throw error;
+      const cart = await daoCarts.readOne(cartId);
+      if (!cart) {
+        const newCart = await daoCarts.createOne({
+          _id: cartId,
+          products: [{ _id: productId, quantity }],
+        });
+        console.log("newCart", newCart);
+        return newCart;
+      } else {
+        const updatedCart = await daoCarts.updateOne(
+          cartId,
+          productId,
+          quantity
+        );
+        console.log("updatedCart", updatedCart);
+        return updatedCart;
       }
-
-      const updatedCart = await daoCarts.updateOne(cartId, productId, quantity);
-      return updatedCart;
     } catch (error) {
       throw error;
     }

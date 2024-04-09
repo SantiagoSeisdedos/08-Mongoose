@@ -10,6 +10,7 @@ import { usersRouter } from "./users.router.js";
 import { sessionsRouter } from "./sessions.router.js";
 import { upload } from "../../middlewares/saveImage.js";
 import { logger } from "../../utils/logger.js";
+import { usersService } from "../../services/users.service.js";
 
 export const webRouter = Router();
 
@@ -19,6 +20,20 @@ webRouter.get("/", (req, res) => {
   } catch (error) {
     logger.info(error);
     return res.status(500).json({ message: "Error loading home" });
+  }
+});
+
+webRouter.get("/usersTable", async (req, res) => {
+  try {
+    const users = await usersService.getUsers();
+
+    return res.render("usersTable.handlebars", {
+      pageTitle: "Users Table",
+      users,
+    });
+  } catch (error) {
+    logger.info(error);
+    return res.status(500).json({ message: "Error loading /usersTable" });
   }
 });
 
@@ -42,7 +57,6 @@ webRouter.get("/products/:id", async (req, res) => {
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
-      // O podrías renderizar una vista de "producto no encontrado"
     }
     return res.render("productDetails.handlebars", {
       product: product.data,
@@ -89,7 +103,6 @@ webRouter.get("/images", (req, res) => {
 webRouter.post("/images", upload.single("productImage"), (req, res) => {
   try {
     if (req.file.filename) {
-      console.log("req.file.filename", req.file.filename);
       const imageUrl = path.join("/products", req.file.filename);
       res.json({ url: imageUrl });
     } else {
@@ -110,7 +123,6 @@ webRouter.get("/carts/:id", async (req, res) => {
 
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
-      // O podrías renderizar una vista de "producto no encontrado"
     }
     return res.render("cartDetails.handlebars", {
       pageTitle: `Cart ${cartId}`,
