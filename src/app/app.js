@@ -1,7 +1,8 @@
 import "dotenv/config";
 import express from "express";
-import handlebars from "express-handlebars";
+import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
+import handlebars from "express-handlebars";
 
 import {
   injectSocketServer,
@@ -50,11 +51,12 @@ export class ServerAPI {
   }
   startServer(port = PORT, baseUrl = BASE_URL) {
     return new Promise((resolve, reject) => {
-      this.#server = this.app.listen(port, () => {
+      const httpServer = createServer(this.app);
+      this.#server = httpServer.listen(port, () => {
         logger.info(`Server on port ${port}: ${baseUrl}`);
 
         // Socket.io
-        this.#webSocketServer = new SocketIOServer(this.#server);
+        this.#webSocketServer = new SocketIOServer(httpServer);
 
         // Websocket server
         this.#webSocketServer.on(
