@@ -109,7 +109,7 @@ const sendProductData = async (user) => {
       credentials: "include",
     };
 
-    await fetch(`http://localhost:8080/api/products`, addProductOptions)
+    await fetch(`/api/products`, addProductOptions)
       .then((res) => {
         if (res.status === 401 || res.status === 403) {
           throw new Error("No estas autorizado para agregar productos");
@@ -178,13 +178,10 @@ const sendProductData = async (user) => {
       addToCartButton.textContent = "Agregar al carrito";
 
       addToCartButton.addEventListener("click", () => {
-        fetch(
-          `http://localhost:8080/api/carts/${user.cart[0]._id}/product/${product._id}`,
-          {
-            method: "POST",
-            credentials: "include",
-          }
-        )
+        fetch(`/api/carts/${user.cart[0]._id}/product/${product._id}`, {
+          method: "POST",
+          credentials: "include",
+        })
           .then((res) => {
             if (res.status === 401 || res.status === 403) {
               throw new Error(
@@ -231,7 +228,7 @@ const sendProductData = async (user) => {
           cancelButtonText: "Cancelar",
         }).then((result) => {
           if (result.isConfirmed) {
-            fetch(`http://localhost:8080/api/products/${product._id}`, {
+            fetch(`/api/products/${product._id}`, {
               method: "DELETE",
               credentials: "include",
             })

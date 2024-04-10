@@ -102,12 +102,12 @@ window.addEventListener("load", async () => {
         }
       });
 
-      if (user.rol === "admin") {
-        document.getElementById("usersTable").removeAttribute("hidden");
-      }
-
       documentDataContainer.appendChild(deleteButton);
       docItem.appendChild(documentDataContainer);
+    }
+
+    if (user.rol === "admin") {
+      document.getElementById("usersTable").removeAttribute("hidden");
     }
 
     logoutButton.addEventListener("click", logout);

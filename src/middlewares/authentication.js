@@ -1,5 +1,4 @@
 import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GithubStrategy } from "passport-github2";
 import { Strategy as JwtStrategy } from "passport-jwt";
 import _ from "mongoose-paginate-v2";
@@ -10,46 +9,29 @@ import {
   GITHUB_CLIENT_SECRET,
   JWT_SECRET,
 } from "../config/config.js";
+import { usersService } from "../services/users.service.js";
 
-// Passport local strategy
+// Passport Github strategy
 // passport.use(
-//   "localLogin",
-//   new LocalStrategy(
+//   "githubLogin",
+//   new GithubStrategy(
 //     {
-//       usernameField: "email",
+//       clientID: GITHUB_CLIENT_ID,
+//       clientSecret: GITHUB_CLIENT_SECRET,
+//       callbackURL: GITHUB_CALLBACK_URL,
 //     },
-//     async function verificationCallback(username, password, done) {
-//       try {
-//         const userData = await userModel.login(username, password);
-//         done(null, userData);
-//       } catch (error) {
-//         done(error);
+//     async (_, __, profile, done) => {
+//       let user = await usersService.getUserByEmail({ email: profile.username });
+//       if (!user) {
+//         user = await userModel.create({
+//           name: profile.displayName,
+//           email: profile.username,
+//         });
 //       }
+//       done(null, user.toObject());
 //     }
 //   )
 // );
-
-// Passport Github strategy
-passport.use(
-  "githubLogin",
-  new GithubStrategy(
-    {
-      clientID: GITHUB_CLIENT_ID,
-      clientSecret: GITHUB_CLIENT_SECRET,
-      callbackURL: GITHUB_CALLBACK_URL,
-    },
-    async (_, __, profile, done) => {
-      let user = await userModel.findOne({ email: profile.username });
-      if (!user) {
-        user = await userModel.create({
-          name: profile.displayName,
-          email: profile.username,
-        });
-      }
-      done(null, user.toObject());
-    }
-  )
-);
 
 // Passport JWT strategy
 passport.use(
