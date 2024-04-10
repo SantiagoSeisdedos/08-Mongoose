@@ -16,10 +16,11 @@ export const webRouter = Router();
 
 webRouter.get("/", (req, res) => {
   try {
-    return res.render("home.handlebars", { pageTitle: "Home" });
+    console.log("req.user", req.user);
+    return res.redirect("/profile");
   } catch (error) {
     logger.info(error);
-    return res.status(500).json({ message: "Error loading home" });
+    return res.status(500).json({ message: "Error" });
   }
 });
 
@@ -39,10 +40,11 @@ webRouter.get("/usersTable", async (req, res) => {
 
 webRouter.get("/products", (req, res) => {
   try {
-    return res.render("products.handlebars", {
-      pageTitle: `Products`,
-      user: req.user,
-    });
+    return res.redirect("/realTimeProducts");
+    // return res.render("products.handlebars", {
+    //   pageTitle: `Products`,
+    //   user: req.user,
+    // });
   } catch (error) {
     return res.status(500).json({ message: "Error loading /products" });
   }

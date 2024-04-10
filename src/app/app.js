@@ -48,6 +48,9 @@ export class ServerAPI {
     this.app.use("/loggerTest", loggerTestRouter);
     this.app.use("/", webRouter);
     this.app.use("/api", apiRouter);
+    this.app.use((req, res, next) => {
+      res.status(404).render("404.handlebars", { pageTitle: "404" });
+    });
   }
   startServer(port = PORT, baseUrl = BASE_URL) {
     return new Promise((resolve, reject) => {
