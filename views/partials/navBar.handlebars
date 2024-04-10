@@ -10,21 +10,29 @@
         <button>Sign in</button>
       </a>
 
-      <a id="navBarProfileButton" target="_self" href="/profile">
+      <a id="navBarProfileButton" target="_self" href="/profile" hidden>
         <button>Perfil</button>
       </a>
 
-      {{!-- <a id="navBarProductsButton" href="/products" target="_self">
+      {{! <a id="navBarProductsButton" href="/products" target="_self">
         <button>Products</button>
-      </a> --}}
+      </a> }}
 
-      <a id="navBarRealTimeButton" href="/realTimeProducts" target="_self">
+      <a
+        id="navBarRealTimeButton"
+        href="/realTimeProducts"
+        target="_self"
+        hidden
+      >
         <button>Ir a Real Time Products</button>
       </a>
 
-      <a id="navBarChatButton" href="/chat" target="_self">
+      <a id="navBarChatButton" href="/chat" target="_self" hidden>
         <button>Ir al chat</button>
       </a>
     </ul>
   </nav>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{!-- <script src="/js/navBar.client.js"></script> --}}
