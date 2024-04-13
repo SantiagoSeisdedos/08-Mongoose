@@ -51,7 +51,14 @@ class UserService {
         error.code = errorStatusMap.NOT_FOUND;
         throw error;
       }
-      return users;
+
+      const mappedUsers = users.map((user) => ({
+        name: user.name,
+        email: user.email,
+        rol: user.rol,
+      }));
+
+      return mappedUsers;
     } catch (error) {
       throw error;
     }
