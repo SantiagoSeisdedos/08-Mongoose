@@ -25,7 +25,7 @@ cartsRouter.delete("/:id", validateId, deleteProductsFromCartController);
 cartsRouter.post(
   "/:id/product/:pid",
   passport.authenticate("jwt", { failWithError: true, session: false }),
-  isAuthorized(["user", "admin"]),
+  isAuthorized(["user", "admin", "premium"]),
   validateId,
   addProductToCartController
 );

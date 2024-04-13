@@ -66,7 +66,7 @@ class UserService {
 
   async getUserByEmail(email) {
     try {
-      const user = await daoUsers.getUser(email);
+      const user = await daoUsers.getUserByEmail(email);
       if (!user) {
         const error = new Error("User not found");
         error.code = errorStatusMap.NOT_FOUND;
